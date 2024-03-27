@@ -221,7 +221,6 @@ g.add_edge(4,5,15)
 g.add_edge(5,4,15)
 
 def simple_heuristic(destination, node):
-    """A very basic heuristic: straight-line distance to the destination (example)."""
     return abs(destination - node) 
 
 predecessors, path = A_star(g, 0, 5, simple_heuristic) 
