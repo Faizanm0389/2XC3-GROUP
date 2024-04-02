@@ -38,32 +38,67 @@ class WeightedGraph:
     def get_number_of_edges(self):
         return sum(len(edges) for edges in self.graph)
     
-def allpair(g):
+
+def dijkstra(g):
     INF = math.inf
     n = g.get_number_of_nodes()
-    m = g.get_number_of_edges()
-    dist = [[INF for _ in range(n)] for _ in range(n)]
+    dist_result = [[INF for _ in range(n)] for _ in range(n)]
+    prev = [[None for _ in range(n)] for _ in range(n)]
+
+    for source in range(n):
+        dist = [INF] * n
+        dist[source] = 0
+        visited = [False] * n
+
+        while True:
+            min_distance = INF
+            min_node = -1
+            for node in range(n):
+                if not visited[node] and dist[node] < min_distance:
+                    min_distance = dist[node]
+                    min_node = node
+
+            if min_node == -1:
+                break
+
+            visited[min_node] = True
+
+            for neighbor in g.get_neighbors(min_node):
+                distance = dist[min_node] + g.get_weights(min_node, neighbor)
+                if distance < dist[neighbor]:
+                    dist[neighbor] = distance
+                    prev[source][neighbor] = min_node
+
+        for dst in range(n):
+            dist_result[source][dst] = dist[dst]
+
+    return dist_result, prev
+
+def bellman_ford(g):
+    INF = math.inf
+    n = g.get_number_of_nodes()
+    dist_result = [[INF for _ in range(n)] for _ in range(n)]
     prev = [[None for _ in range(n)] for _ in range(n)]
 
     for i in range(n):
-        for j in range(n):
-            if i==j:
-                dist[i][j]=0
-    
-    for i in range(n):
-        edge = g.get_neighbors(i)
-        if edge:
-            for j in edge:
-                dist[i][j] = g.get_weights(i,j)
+        dist_result[i][i] = 0
 
-    for visit in range(0,n):
-        for source in range(0,n):
-            for dest in range(0,n):
-                if dist[source][visit] + dist[visit][dest] < dist[source][dest]:
-                    dist[source][dest] = dist[source][visit] + dist[visit][dest]
-                    prev[source][dest] = visit
+    for source in range(n):
+        distance = [INF] * n
+        distance[source] = 0
 
-    return dist, prev
+        for _ in range(n - 1):
+            for node in range(n):
+                for neighbor in g.get_neighbors(node):
+                    weight = g.get_weights(node, neighbor)
+                    if distance[node] + weight < distance[neighbor]:
+                        distance[neighbor] = distance[node] + weight
+                        prev[source][neighbor] = node
+
+        dist_result[source] = distance
+
+    return dist_result, prev
+
 
     
 g= WeightedGraph(6)
@@ -91,8 +126,8 @@ g.add_edge(5,3,40)
 
 g.add_edge(4,5,15)
 
-dist, prev = allpair(g)
-
+# dist, prev = dijkstra(g)
+dist, prev = bellman_ford(g)
 print("Distance for all pairs: \n")
 for row in dist:
     print(row)
