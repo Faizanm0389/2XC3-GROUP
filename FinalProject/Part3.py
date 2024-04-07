@@ -1,15 +1,29 @@
 import math
 
+class Node:
+    def __init__(self, node_id, latitude, longitude, name, display_name, zone, total_lines, rail):
+        self.id = node_id
+        self.point = (latitude, longitude)
+        self.name = name
+        self.display_name = display_name
+        self.zone = zone
+        self.total_lines = total_lines
+        self.rail = rail
+        self.neighbors = {}
+
 class Item:
-    def __init__(self, value, key):
+    def __init__(self, value, key, node):
         self.key = key
         self.value = value
+        self.node = node
 
     def __lt__(self, other):  # For use with priority queue
         return self.key < other.key 
 
     def __str__(self):
         return "(" + str(self.key) + "," + str(self.value) + ")"
+
+
 
 class MinHeap:
     def __init__(self, data):
@@ -119,40 +133,40 @@ class MinHeap:
             whitespace = whitespace // 2
         return s
 
-class WeightedGraph:
+# class WeightedGraph2:
+#     def __init__(self):
+#         self.nodes = {}
+#         self.weights = {}
 
-    def __init__(self,nodes):
-        self.graph=[]
-        self.weights={}
-        for node in range(nodes):
-            self.graph.append([])
+#     def add_edge(self, node1, node2, weight):
+#         node1.neighbors[node2] = weight
+#         node2.neighbors[node1] = weight
+#         self.weights[(node1.id, node2.id)] = weight
 
-    def add_node(self,node):
-        self.graph[node]=[]
+#     def add_node(self, node):
+#         self.nodes[node.id] = node
 
-    def add_edge(self, node1, node2, weight):
-        if node2 not in self.graph[node1]:
-            self.graph[node1].append(node2)
-        self.weights[(node1, node2)] = weight
+#     def get_weights(self, node1_id, node2_id):  # Modified
+#         if self.are_connected(node1_id, node2_id):
+#             return self.weights[(node1_id, node2_id)]
 
-    def get_weights(self, node1, node2):
-        if self.are_connected(node1, node2):
-            return self.weights[(node1, node2)]
+#     def are_connected(self, node1_id, node2_id):  # Modified
+#         node1 = self.nodes.get(node1_id)
+#         if node1:
+#             return node2_id in node1.neighbors
+#         return False
 
-    def are_connected(self, node1, node2):
-        for neighbour in self.graph[node1]:
-            if neighbour == node2:
-                return True
-        return False
+#     def get_neighbors(self, node_id):  # Modified
+#         node = self.nodes.get(node_id)
+#         if node:
+#             return list(node.neighbors.keys()) 
+#         return []
 
-    def get_neighbors(self, node):
-        return self.graph[node]
+#     def get_number_of_nodes(self):
+#         return len(self.nodes)
 
-    def get_number_of_nodes(self,):
-        return len(self.graph)
-    
-    def get_nodes(self,):
-        return [i for i in range(len(self.graph))]
+#     def get_nodes(self):
+#         return list(self.nodes.keys())
 
 def A_star(graph, source, destination, heuristic):
     visited = {}
@@ -161,68 +175,35 @@ def A_star(graph, source, destination, heuristic):
 
     Q = MinHeap([])
 
-    for i in range(graph.get_number_of_nodes()):
-        visited[i] = False
-        distance[i] = float("inf")
-        predecessors[i] = None
+    for node_id in graph.get_nodes():
+        visited[node_id] = False
+        distance[node_id] = float("inf")
+        predecessors[node_id] = None
 
-    distance[source] = 0
-    Q.insert(Item(source, heuristic(destination, source)))
+    distance[source.id] = 0 
+    Q.insert(Item(source.id, heuristic(destination, source), source)) 
 
     while not Q.is_empty():
         current_item = Q.extract_min()
-        current_node = current_item.value
+        current_node_id = current_item.value 
 
-        if current_node == destination:
-            path = []
-            while current_node is not None:
-                path.insert(0, current_node)
-                current_node = predecessors[current_node]
-            return predecessors, path
+        if current_node_id == destination.id:
+            # Reconstruct path (exercise for you)
+            return predecessors, []  
 
-        visited[current_node] = True
+        visited[current_node_id] = True
 
-        for neighbour in graph.graph[current_node]:
-            edge_weight = graph.get_weights(current_node, neighbour)
+        for neighbor in graph.get_neighbors(current_node_id):
+            neighbor_id = neighbor.id
+            edge_weight = graph.get_weights(current_node_id, neighbor_id)
+            temp = distance[current_node_id] + edge_weight
 
-            temp = distance[current_node] + edge_weight
+            if not visited[neighbor_id] and temp < distance[neighbor_id]:
+                distance[neighbor_id] = temp
+                predecessors[neighbor_id] = current_node_id
 
-            if not visited[neighbour] and temp < distance[neighbour]:
-                distance[neighbour] = temp
-                predecessors[neighbour] = current_node
-                Q.insert(Item(neighbour, temp + heuristic(destination, neighbour)))
+                neighbor_node = graph.nodes[neighbor_id]  
+                item = Item(neighbor_id, temp + heuristic(destination, neighbor_node), neighbor_node) 
+                Q.insert(item)
 
-    return {}, []
-
-g= WeightedGraph(6)
-
-g.add_edge(0,1,15)
-g.add_edge(1,0,15)
-
-g.add_edge(1,2,10)
-g.add_edge(2,1,10)
-
-g.add_edge(2,3,5)
-g.add_edge(3,2,5)
-
-g.add_edge(1,3,20)
-g.add_edge(3,1,20)
-
-g.add_edge(2,4,30)
-g.add_edge(4,2,30)
-
-g.add_edge(4,3,25)
-g.add_edge(3,4,25)
-
-g.add_edge(3,5,40)
-g.add_edge(5,3,40)
-
-g.add_edge(4,5,15)
-g.add_edge(5,4,15)
-
-def simple_heuristic(destination, node):
-    return abs(destination - node) 
-
-predecessors, path = A_star(g, 0, 5, simple_heuristic) 
-print("Predecessors:", predecessors)
-print("Shortest Path:", path)
+    return {}, [] 
