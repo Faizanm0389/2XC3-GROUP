@@ -133,41 +133,6 @@ class MinHeap:
             whitespace = whitespace // 2
         return s
 
-# class WeightedGraph2:
-#     def __init__(self):
-#         self.nodes = {}
-#         self.weights = {}
-
-#     def add_edge(self, node1, node2, weight):
-#         node1.neighbors[node2] = weight
-#         node2.neighbors[node1] = weight
-#         self.weights[(node1.id, node2.id)] = weight
-
-#     def add_node(self, node):
-#         self.nodes[node.id] = node
-
-#     def get_weights(self, node1_id, node2_id):  # Modified
-#         if self.are_connected(node1_id, node2_id):
-#             return self.weights[(node1_id, node2_id)]
-
-#     def are_connected(self, node1_id, node2_id):  # Modified
-#         node1 = self.nodes.get(node1_id)
-#         if node1:
-#             return node2_id in node1.neighbors
-#         return False
-
-#     def get_neighbors(self, node_id):  # Modified
-#         node = self.nodes.get(node_id)
-#         if node:
-#             return list(node.neighbors.keys()) 
-#         return []
-
-#     def get_number_of_nodes(self):
-#         return len(self.nodes)
-
-#     def get_nodes(self):
-#         return list(self.nodes.keys())
-
 def A_star(graph, source, destination, heuristic):
     visited = {}
     distance = {}
