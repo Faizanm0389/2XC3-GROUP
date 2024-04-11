@@ -132,6 +132,9 @@ def dijkstra2(G, source, destination):
         current_node_id = current_element.value  
         dist[current_node_id] = current_element.key
         visited[current_node_id] = True
+
+        if current_node_id == destination.id:
+            return dist[destination.id], relaxCount[destination.id]
         
         for neighbor in G.get_neighbors(current_node_id):
             neighbor_id = neighbor.id
@@ -147,11 +150,48 @@ def dijkstra2(G, source, destination):
                     if prev_line is not None and neighbor.total_lines != prev_line:
                         relaxCount[neighbor_id]['transfers'] += 1
                     # Update distance and line information
-                    relaxCount[neighbor_id]['distance'] = temp
+                    relaxCount[neighbor_id]['distance'] += 1
                     prev_line = neighbor.total_lines
     # print(dist, relaxCount)
     return dist[destination.id], relaxCount[destination.id]
 
+
+def dijkstra3(G, source, destination):
+    dist = {}
+    Q = MinHeap([])
+    nodes = list(G.nodes.keys())
+    visited = {}
+
+    for node_id in nodes:
+        Q.insert(Item(node_id, float("inf"))) 
+        dist[node_id] = float("inf")
+        visited[node_id] = False
+
+    # Update distance for the source node
+    dist[source.id] = 0
+    Q.decrease_key(source.id, 0)
+    visited[source.id] = True
+
+    while not Q.is_empty() and not visited[destination.id]:
+        current_element = Q.extract_min()
+        current_node_id = current_element.value  
+        dist[current_node_id] = current_element.key
+        visited[current_node_id] = True
+
+        if current_node_id == destination.id:
+            return dist[destination.id]
+        
+        for neighbor in G.get_neighbors(current_node_id):
+            neighbor_id = neighbor.id
+            weight = G.get_weights(current_node_id, neighbor_id)
+
+            if not visited[neighbor_id]:  
+                temp = dist[current_node_id] + weight
+                if temp < dist[neighbor_id]:
+                    Q.decrease_key(neighbor_id, temp)
+                    dist[neighbor_id] = temp
+
+    return dist[destination.id]
 
 def heuristic(destination, current):
     dx = destination.point[0] - current.point[0]
@@ -160,6 +200,8 @@ def heuristic(destination, current):
 
 print(dijkstra2(graph,graph.nodes[11],graph.nodes[30]))
 
+print(A_star(graph,graph.nodes[11],graph.nodes[30], heuristic))
+
 def dictextract(dictarr, index):
     res = []
     for dictionary in dictarr:
@@ -167,8 +209,8 @@ def dictextract(dictarr, index):
     return res
 
 def experimentplot1(results, title):
-    plt.plot(range(0, len(results)), dictextract(results, "astar_time"), label='A*')
-    plt.plot(range(0, len(results)), dictextract(results, "dijkstra_time"), label='Dijkstra')
+    plt.scatter(range(0, len(results)), dictextract(results, "astar_time"), label='A*')
+    plt.scatter(range(0, len(results)), dictextract(results, "dijkstra_time"), label='Dijkstra')
     plt.xlabel('Path #')
     plt.ylabel('Execution time')
     plt.title(title)
@@ -200,8 +242,10 @@ def run_experiment(graph):
                 destination_node = graph.nodes.get(destination_node_id)  # Get Node object
 
                 start_time = timeit.default_timer()
-                dijkstra_distance, relaxCount = dijkstra2(graph, source_node, destination_node)  
+                dijkstra_distance = dijkstra3(graph, source_node, destination_node)  
                 dijkstra_time = timeit.default_timer() - start_time
+
+                dijkstra_distance, relaxCount = dijkstra2(graph, source_node, destination_node) 
 
                 start_time = timeit.default_timer()
                 A_star(graph, source_node, destination_node, heuristic)
@@ -246,4 +290,4 @@ def run_experiment(graph):
     return results
 
 
-run_experiment(graph)
+# run_experiment(graph)

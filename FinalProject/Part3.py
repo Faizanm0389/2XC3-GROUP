@@ -153,9 +153,7 @@ def A_star(graph, source, destination, heuristic):
         current_node_id = current_item.value 
 
         if current_node_id == destination.id:
-            # Reconstruct path (exercise for you)
-            return predecessors, []  
-
+            return distance[destination.id]
         visited[current_node_id] = True
 
         for neighbor in graph.get_neighbors(current_node_id):
@@ -171,4 +169,4 @@ def A_star(graph, source, destination, heuristic):
                 item = Item(neighbor_id, temp + heuristic(destination, neighbor_node), neighbor_node) 
                 Q.insert(item)
 
-    return {}, [] 
+    return distance[destination.id]
