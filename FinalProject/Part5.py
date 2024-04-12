@@ -1,7 +1,8 @@
 from typing import Dict,List
 from abc import ABC, abstractmethod
-import Part1
+from Part2 import WeightedGraph
 from Part3 import A_star
+import math
 
 class Graph:
 
@@ -10,24 +11,23 @@ class Graph:
         self.weights = {}
 
     def get_adj_nodes(self, node:int) -> List[int]:
-        return Part1.WeightedGraph.get_neighbors(self,node)
+        return WeightedGraph.get_neighbors(self,node)
 
     def add_node(self, node:int):
         self.graph.append(node)
 
     def add_edge(self, start:int, end:int, w:float):
-        return Part1.WeightedGraph.add_edge(self,start,end,w)
+        return WeightedGraph.add_edge(self,start,end,w)
 
     def get_num_of_nodes(self) -> int:
-        return Part1.WeightedGraph.get_number_of_nodes(self)
+        return WeightedGraph.get_number_of_nodes(self)
     
-    def w(self, node1:int, node2:int)-> float:
-        return Part1.WeightedGraph.weights.get((self,node1, node2))
+    # TA said there should be no w in class "Graph".
 
 class WeightedGraph(Graph):
 
     def w(self,node1:int, node2:int) -> float:
-        return Part1.WeightedGraph.weights.get((self,node1, node2))
+        return WeightedGraph.weights.get((self,node1, node2))
     
 class HeuristicGraph(WeightedGraph):
     def __init__(self, nodes):
@@ -49,93 +49,70 @@ class SPAlgorithm(ABC):
 
 class Dijkstra(SPAlgorithm):
 
-    def calc_sp(self,Graph, source, k):
-        visited = {}
-        distance = {}
-        relax_count = {}  
-        predecessor = {} 
+    # from Part 2
+    def calc_sp(g):
+        INF = math.inf
+        n = g.get_number_of_nodes()
+        dist_result = [[INF for _ in range(n)] for _ in range(n)]
+        prev = [[None for _ in range(n)] for _ in range(n)]
 
-        Q = Part1.MinHeap([])
+        for source in range(n):
+            dist = [INF] * n
+            dist[source] = 0
+            marked = [False] * n
 
-        for i in range(Graph.get_number_of_nodes()):
-            visited[i] = False
-            distance[i] = float("inf")
-            relax_count[i] = 0 
-            predecessor[i] = None  
+            while True:
+                min_distance = INF
+                min_node = -1
+                for node in range(n):
+                    if not marked[node] and dist[node] < min_distance:
+                        min_distance = dist[node]
+                        min_node = node
 
-            Q.insert(Part1.Item(i, 0))
+                if min_node == -1:
+                    break
 
+                marked[min_node] = True
 
-        Q.decrease_key(source, 0)
-        distance[source] = 0
+                for neighbor in g.get_neighbors(min_node):
+                    distance = dist[min_node] + g.get_weights(min_node, neighbor)
+                    if distance < dist[neighbor]:
+                        dist[neighbor] = distance
+                        prev[source][neighbor] = min_node
 
-        while not Q.is_empty():
-            current_node = Q.extract_min().value
-            visited[current_node] = True
+            for dst in range(n):
+                dist_result[source][dst] = dist[dst]
 
-            for neighbour in Graph.graph[current_node]:
-                edge_weight = Graph.get_weights(current_node, neighbour)
-                temp = distance[current_node] + edge_weight
-                if not visited[neighbour]:
-                    if temp < distance[neighbour]:
-                        distance[neighbour] = temp
-                        Q.decrease_key(neighbour, temp)
-                        relax_count[neighbour] += 1  
-                        predecessor[neighbour] = current_node  
-            if relax_count[current_node] >= k:
-                break
-
-        def k_path(node, predecessor, path=[]):
-            if node is None:
-                return path
-            path.insert(0, node)
-            return k_path(predecessor[node], predecessor, path)
-        shortest_paths = {}
-        node = 0
-        while True:
-            shortest_paths[node] = k_path(node, predecessor)
-            node += 1
-            if node >= Graph.get_number_of_nodes():
-                break
-
-        return distance, shortest_paths
+        return dist_result, prev
 
 
 class Bellman_Ford(SPAlgorithm):
 
-    def calc_sp(self,graph, source, k):
-    
-        distance = {node: float('inf') for node in graph.get_nodes()}
-        predecessor = {node: None for node in graph.get_nodes()}
-        distance[source] = 0
+    # from Part 2
+    def bellman_ford(g):
+        INF = math.inf
+        n = g.get_number_of_nodes()
+        dist_result = [[INF for _ in range(n)] for _ in range(n)]
+        prev = [[None for _ in range(n)] for _ in range(n)]
 
-        for _ in range(k):
-            relaxed = False
-            for u, v, weight in graph.get_edges():
-                if distance[u] + weight < distance[v]:
-                    distance[v] = distance[u] + weight
-                    predecessor[v] = u
-                    relaxed = True
-            else:
-                break
+        for i in range(n):
+            dist_result[i][i] = 0
 
-            for u in graph.get_nodes():
-                for v in graph.get_neighbors(u):
-                    weight = graph.get_weights(u, v)
-                    if distance[u] + weight < distance[v]:
-                        return None
+        for source in range(n):
+            distance = [INF] * n
+            distance[source] = 0
 
-        def k_path(node, predecessor, path=[]):
-            if node is None:
-                return path
-            path.insert(0, node)
-            return k_path(predecessor[node], predecessor, path)
+            for _ in range(n - 1):
+                for node in range(n):
+                    for neighbor in g.get_neighbors(node):
+                        weight = g.get_weights(node, neighbor)
+                        if distance[node] + weight < distance[neighbor]:
+                            distance[neighbor] = distance[node] + weight
+                            prev[source][neighbor] = node
 
-        shortest_paths = {}
-        for node in graph.get_nodes():
-            shortest_paths[node] = k_path(node, predecessor)
+            dist_result[source] = distance
 
-        return distance, shortest_paths
+        return dist_result, prev
         
 class A_Star(SPAlgorithm):
 
@@ -149,6 +126,7 @@ class A_Star(SPAlgorithm):
 
 class AStarAdapter:
 
+    # From Part 3
     def __init__(self):
         self.a_star = A_star()
 
@@ -171,3 +149,30 @@ class ShortPathFinder:
 
     def set_algorithm(self, algorithm:SPAlgorithm):
         self._SPAlgorithm = algorithm
+
+
+# Create a graph
+graph = Graph(nodes=5)
+
+# Add nodes
+graph.add_node(0)
+graph.add_node(1)
+graph.add_node(2)
+graph.add_node(3)
+graph.add_node(4)
+
+# Add weighted edges
+graph.add_edge(0, 1, 5.0)
+graph.add_edge(0, 2, 3.0)
+graph.add_edge(1, 3, 2.0)
+graph.add_edge(2, 3, 1.0)
+graph.add_edge(3, 4, 4.0)
+
+# Create an instance of A* algorithm
+a_star = A_Star()
+
+# Calculate shortest path from node 0 to node 4
+shortest_distance = a_star.calc_sp(graph, 0, 4)
+
+print("Shortest distance from node 0 to node 4:", shortest_distance)
+
