@@ -48,20 +48,20 @@ def dijkstra(g):
     for source in range(n):
         dist = [INF] * n
         dist[source] = 0
-        visited = [False] * n
+        marked = [False] * n
 
         while True:
             min_distance = INF
             min_node = -1
             for node in range(n):
-                if not visited[node] and dist[node] < min_distance:
+                if not marked[node] and dist[node] < min_distance:
                     min_distance = dist[node]
                     min_node = node
 
             if min_node == -1:
                 break
 
-            visited[min_node] = True
+            marked[min_node] = True
 
             for neighbor in g.get_neighbors(min_node):
                 distance = dist[min_node] + g.get_weights(min_node, neighbor)
@@ -73,6 +73,7 @@ def dijkstra(g):
             dist_result[source][dst] = dist[dst]
 
     return dist_result, prev
+
 
 def bellman_ford(g):
     INF = math.inf
@@ -126,13 +127,11 @@ g.add_edge(5,3,40)
 
 g.add_edge(4,5,15)
 
-# dist, prev = dijkstra(g)
+dist, prev = dijkstra(g)
 dist, prev = bellman_ford(g)
 print("Distance for all pairs: \n")
 for row in dist:
-    print(row)
-# print(dist[5][0])
-# print(prev[5][0])
+    print(row)\
 
 print("\n \n")
 
