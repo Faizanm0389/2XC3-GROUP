@@ -348,6 +348,6 @@ def experiment_graph_relaxation():
 
 
 
-print(experiment_graph_size())
-print(experiment_graph_relaxation())
-print(experiment_graph_density())
+# print(experiment_graph_size())
+# print(experiment_graph_relaxation())
+# print(experiment_graph_density())

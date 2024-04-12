@@ -114,7 +114,7 @@ def dijkstra2(G, source, destination):
     nodes = list(G.nodes.keys())
     relaxCount = {}
     visited = {}
-    prev_line = None
+    prev_line = source.total_lines
 
     for node_id in nodes:
         Q.insert(Item(node_id, float("inf"))) 
@@ -147,7 +147,7 @@ def dijkstra2(G, source, destination):
                     dist[neighbor_id] = temp
 
                     # Update transfer count if line transfer occurs
-                    if prev_line is not None and neighbor.total_lines != prev_line:
+                    if neighbor.total_lines != prev_line:
                         relaxCount[neighbor_id]['transfers'] += 1
                     # Update distance and line information
                     relaxCount[neighbor_id]['distance'] += 1
@@ -225,7 +225,7 @@ def run_experiment(graph):
     transferdict = {}
 
     # # debug only
-    # debuglimit = 20
+    # debuglimit = 1
     # debugcount = 0
 
     for source_node_id in graph.get_nodes():  # Iterate over node IDs
