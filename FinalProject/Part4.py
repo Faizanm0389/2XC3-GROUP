@@ -222,16 +222,17 @@ def run_experiment(graph):
     sameline = [] 
     adjline = []
     sevline = []
+    transferdict = {}
 
-    # comment out later
-    debuglimit = 1
-    debugcount = 0
+    # # debug only
+    # debuglimit = 20
+    # debugcount = 0
 
     for source_node_id in graph.get_nodes():  # Iterate over node IDs
-        # debug only
-        if debugcount >= debuglimit:
-            break
-        debugcount += 1
+        # # debug only
+        # if debugcount >= debuglimit:
+        #     break
+        # debugcount += 1
 
         for destination_node_id in graph.get_nodes(): 
             if source_node_id != destination_node_id:
@@ -272,11 +273,14 @@ def run_experiment(graph):
                 else:
                     sevline.append(temp)
 
-                transferdict = {}
+                
                 try:
                     transferdict[tcount] += 1
                 except:
                     transferdict[tcount] = 1
+    
+    print("Line Transfer Occurences:")
+    print(transferdict)
     
     experimentplot1(results, title='Dijkstra vs A* time')
 
@@ -286,8 +290,15 @@ def run_experiment(graph):
 
     experimentplot1(sevline, title='Dijkstra vs A* time (several line transfers)')
 
+    
+    plt.bar(list(transferdict.keys()), transferdict.values(), label='Shortest Path')
+    plt.xlabel('# of line transfers')
+    plt.ylabel('Frequency')
+    plt.title("Line transfer frequency")
+    plt.legend()
+    plt.show()
         
     return results
 
 
-# run_experiment(graph)
+run_experiment(graph)
