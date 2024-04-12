@@ -1,7 +1,7 @@
+from typing import Dict,List
 from abc import ABC, abstractmethod
 import Part1
 from Part3 import A_star
-from typing import Dict,List
 
 class Graph:
 
@@ -147,7 +147,6 @@ class A_Star(SPAlgorithm):
 
         return self.adapter.shortest_distance(graph, source, dest)
 
-# Define the adapter class
 class AStarAdapter:
 
     def __init__(self):
