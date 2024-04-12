@@ -89,7 +89,7 @@ class Dijkstra(SPAlgorithm):
 class Bellman_Ford(SPAlgorithm):
 
     # from Part 2
-    def bellman_ford(g):
+    def calc_sp(g):
         INF = math.inf
         n = g.get_number_of_nodes()
         dist_result = [[INF for _ in range(n)] for _ in range(n)]
@@ -149,30 +149,4 @@ class ShortPathFinder:
 
     def set_algorithm(self, algorithm:SPAlgorithm):
         self._SPAlgorithm = algorithm
-
-
-# Create a graph
-graph = Graph(nodes=5)
-
-# Add nodes
-graph.add_node(0)
-graph.add_node(1)
-graph.add_node(2)
-graph.add_node(3)
-graph.add_node(4)
-
-# Add weighted edges
-graph.add_edge(0, 1, 5.0)
-graph.add_edge(0, 2, 3.0)
-graph.add_edge(1, 3, 2.0)
-graph.add_edge(2, 3, 1.0)
-graph.add_edge(3, 4, 4.0)
-
-# Create an instance of A* algorithm
-a_star = A_Star()
-
-# Calculate shortest path from node 0 to node 4
-shortest_distance = a_star.calc_sp(graph, 0, 4)
-
-print("Shortest distance from node 0 to node 4:", shortest_distance)
 
