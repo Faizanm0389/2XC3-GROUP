@@ -1,8 +1,9 @@
-import math
+import math 
 import random
 import timeit
 import matplotlib.pyplot as plt
 import numpy as np
+
 
 class MinHeap:
     def __init__(self, data):
@@ -43,7 +44,7 @@ class MinHeap:
             # recursive call
             self.sink_down(smallest_known_index)
 
-    def build_heap(self):
+    def build_heap(self,):
         for i in range(self.length // 2 - 1, -1, -1):
             self.sink_down(i) 
 
@@ -62,7 +63,7 @@ class MinHeap:
 
     def swim_up(self, index):
         
-        while index > 0 and self.items[self.find_parent_index(index)].key > self.items[index].key:
+        while index > 0 and self.items[self.find_parent_index(index)].key < self.items[self.find_parent_index(index)].key:
             #swap values
             self.items[index], self.items[self.find_parent_index(index)] = self.items[self.find_parent_index(index)], self.items[index]
             #update map
@@ -111,8 +112,6 @@ class MinHeap:
             s += "\n"
             whitespace = whitespace // 2
         return s
-
-        
 class Item:
     def __init__(self, value, key):
         self.key = key
@@ -120,7 +119,7 @@ class Item:
     
     def __str__(self):
         return "(" + str(self.key) + "," + str(self.value) + ")"
-
+    
 class WeightedGraph:
     def __init__(self, nodes):
         self.graph = [[] for _ in range(nodes)]
@@ -153,151 +152,9 @@ class WeightedGraph:
     def __iter__(self):
         return iter(self.graph)
 
-# 1.1
 
 
-def dijkstra(Graph,source):
-
-    visited = {}
-    distance = {}
-
-    # create empty queue
-    Q = MinHeap([])
-
-    for i in range(Graph.get_number_of_nodes()):
-
-        visited[i] = False
-        distance[i] = float("inf")
-
-        # insert the nodes in the minheap
-        Q.insert(Item(i, float("inf")))
-
-    print(Q)
-
-    # assign 0 to source 
-    Q.decrease_key(source, 0)
-    distance[source] = 0
-
-    while not (Q.is_empty() ):
-        # get current node
-        current_node = Q.extract_min().value
-        visited[current_node] = True
-
-        for neighbour in Graph.graph[current_node]:
-            # get weight of current node
-            edge_weight = Graph.get_weights(current_node, neighbour)
-
-            temp = distance[current_node] + edge_weight
-
-            # not visited yet
-            if not visited[neighbour]:
-                if temp < distance[neighbour]:
-                    distance[neighbour] = temp
-                    Q.decrease_key(neighbour, temp)
-
-    return distance
-
-
-g= WeightedGraph(6)
-
-g.add_edge(0,1,15)
-g.add_edge(1,0,15)
-
-g.add_edge(1,2,10)
-g.add_edge(2,1,10)
-
-g.add_edge(2,3,5)
-g.add_edge(3,2,5)
-
-g.add_edge(1,3,20)
-g.add_edge(3,1,20)
-
-g.add_edge(2,4,30)
-g.add_edge(4,2,30)
-
-g.add_edge(4,3,25)
-g.add_edge(3,4,25)
-
-g.add_edge(3,5,40)
-g.add_edge(5,3,40)
-
-g.add_edge(4,5,15)
-g.add_edge(5,4,15)
-
-
-
-dijkstra(g,1)
-
-
-def dijkstra(Graph,source,destination):
-
-    visited = {}
-    distance = {}
-
-    # create empty queue
-    Q = MinHeap([])
-
-    for i in range(Graph.get_number_of_nodes()):
-
-        visited[i] = False
-        distance[i] = float("inf")
-
-        # insert the nodes in the minheap
-        Q.insert(Item(i, float("inf")))
-
-    print(Q)
-
-    # assign 0 to source 
-    Q.decrease_key(source, 0)
-    distance[source] = 0
-
-    while not (Q.is_empty() or visited[destination]):
-        # get current node
-        current_node = Q.extract_min().value
-        visited[current_node] = True
-
-        for neighbour in Graph.graph[current_node]:
-            # get weight of current node
-            edge_weight = Graph.get_weights(current_node, neighbour)
-
-            temp = distance[current_node] + edge_weight
-
-            # not visited yet
-            if not visited[neighbour]:
-                if temp < distance[neighbour]:
-                    distance[neighbour] = temp
-                    Q.decrease_key(neighbour, temp)
-
-    return distance[destination]
-
-
-g= WeightedGraph(6)
-
-g.add_edge(0,1,15)
-g.add_edge(1,0,15)
-
-g.add_edge(1,2,10)
-g.add_edge(2,1,10)
-
-g.add_edge(2,3,5)
-g.add_edge(3,2,5)
-
-g.add_edge(1,3,20)
-g.add_edge(3,1,20)
-
-g.add_edge(2,4,30)
-g.add_edge(4,2,30)
-
-g.add_edge(4,3,25)
-g.add_edge(3,4,25)
-
-g.add_edge(3,5,40)
-g.add_edge(5,3,40)
-
-g.add_edge(4,5,15)
-g.add_edge(5,4,15)
-dijkstra(g,1,5)
-
+#part 1.1
 
 def dijkstra_relax(Graph, source, k):
     visited = {}
@@ -350,38 +207,10 @@ def dijkstra_relax(Graph, source, k):
 
     return distance, shortest_paths
 
-# using dict visited, distance, relax_count, pred to track visited nodes, shortest dist, relax count and pred for each node. 
 
 
-# Create the weighted graph
-g = WeightedGraph(6)
+#part 1.2
 
-g.add_edge(0, 1, 15)
-g.add_edge(1, 0, 15)
-g.add_edge(1, 2, 10)
-g.add_edge(2, 1, 10)
-g.add_edge(2, 3, 5)
-g.add_edge(3, 2, 5)
-g.add_edge(1, 3, 20)
-g.add_edge(3, 1, 20)
-g.add_edge(2, 4, 30)
-g.add_edge(4, 2, 30)
-g.add_edge(4, 3, 25)
-g.add_edge(3, 4, 25)
-g.add_edge(3, 5, 40)
-g.add_edge(5, 3, 40)
-g.add_edge(4, 5, 15)
-g.add_edge(5, 4, 15)
-
-source_node = 0
-k = 2
-x = dijkstra_relax(g, source_node, k)
-print(x)
-
-
-# 1.2
-
-#original bellman ford was inspired from https://www.geeksforgeeks.org/bellman-ford-algorithm-dp-23/ 
 def bellamford_relax(graph, source, k):
   
     distance = {node: float('inf') for node in graph.get_nodes()}
@@ -416,56 +245,18 @@ def bellamford_relax(graph, source, k):
 
     return distance, shortest_paths
 
-
-
-
-
-
-
-
-g = WeightedGraph(6)
-
-g.add_edge(0, 1, 15)
-g.add_edge(1, 0, 15)
-g.add_edge(1, 2, 10)
-g.add_edge(2, 1, 10)
-g.add_edge(2, 3, 5)
-g.add_edge(3, 2, 5)
-g.add_edge(1, 3, 20)
-g.add_edge(3, 1, 20)
-g.add_edge(2, 4, 30)
-g.add_edge(4, 2, 30)
-g.add_edge(4, 3, 25)
-g.add_edge(3, 4, 25)
-g.add_edge(3, 5, 40)
-g.add_edge(5, 3, 40)
-g.add_edge(4, 5, 15)
-g.add_edge(5, 4, 15)
-shortest_distance = bellamford_relax(g, 0, 2)
-print(shortest_distance)
-
-# 1.3
-
+#part 1.3
 
 def gen_graph(n):
     graph = WeightedGraph(n)
     
     for n1 in range(n):
         for n2 in range(n1 + 1, n):  
-            if random.random() < 0.5:  
-                weight = random.randint(1, 10) 
-                graph.add_edge(n1, n2, weight)
-                graph.add_edge(n2, n1, weight)
+            weight = random.randint(1, 10) 
+            graph.add_edge(n1, n2, weight)
+            graph.add_edge(n2, n1, weight)
     
     return graph
-
-
-x=gen_graph(5)
-print(dijkstra_relax(x,0,4))
-print(bellamford_relax(x,0,4))
-
-
-
 
 def experiment_graph_size():
 
@@ -497,42 +288,37 @@ def experiment_graph_size():
   plt.legend()
   plt.show()
 
-
-
 def experiment_graph_density():
     bellman_time = []
     dijkstra_time = []
+    graph = WeightedGraph(1000)
+    for i in range(100):
+        graph.add_edge(i, i, 0)
+        
+    for i in range(1, 1000, 100):
+        for j in range(i):
+            n1 = random.randint(0, 999)
+            n2 = random.randint(0, 999)
+            w = random.randint(1, 10)
+            graph.add_edge(n1, n2, w)
 
-    graph = WeightedGraph(5)
-    graph.add_edge(0, 1, 4)
-    graph.add_edge(0, 2, 2)
-
-    for n in range(10, 2000, 50):
-        random_node = random.randint(1, min(n-1, 4))  
-        weight = random.randint(5, 10)
-        graph.add_edge(0, random_node, weight)
-
-        #belllman
         start = timeit.default_timer()
-        bellamford_relax(graph, 0, n-1)
+        bellamford_relax(graph, 0, 999)
         stop = timeit.default_timer()
         bellman_time.append(stop - start)
 
-        #  Dijkstra
         start = timeit.default_timer()
-        dijkstra_relax(graph, 0, n-1)
+        dijkstra_relax(graph, 0, 999)
         stop = timeit.default_timer()
         dijkstra_time.append(stop - start)
 
-    # Plot the results
-    plt.plot(np.arange(10, 2000, 50), bellman_time, label='Bellman-Ford')
-    plt.plot(np.arange(10, 2000, 50), dijkstra_time, label='Dijkstra')
-    plt.xlabel('Density from source node')
+    plt.plot(np.arange(0, 1000, 100), bellman_time, label='Bellman-Ford')
+    plt.plot(np.arange(0, 1000, 100), dijkstra_time, label='Dijkstra')
+    plt.xlabel('Density')
     plt.ylabel('Execution time')
-    plt.title('Experiment Graph Density ')
+    plt.title('Experiment Graph Density')
     plt.legend()
     plt.show()
-
 
 def experiment_graph_relaxation():
     bellman_times = []
@@ -558,10 +344,10 @@ def experiment_graph_relaxation():
     plt.ylabel('Execution time')
     plt.title('Experiment Relaxation limit ')
     plt.legend()
-    plt.show()
+    plt.show()   
 
-# experiment_graph_size()
 
-# experiment_graph_density()
 
-# experiment_graph_relaxation()
+print(experiment_graph_size())
+print(experiment_graph_relaxation())
+print(experiment_graph_density())
