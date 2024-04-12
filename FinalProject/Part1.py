@@ -4,7 +4,6 @@ import timeit
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 class MinHeap:
     def __init__(self, data):
         self.items = data
