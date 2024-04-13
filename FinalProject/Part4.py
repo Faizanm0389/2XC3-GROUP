@@ -29,7 +29,6 @@ class WeightedGraph2:
         self.nodes[node.id] = node
 
     def get_weights(self, node1_id, node2_id):  
-        # print("Looking up key:", (node1_id, node2_id))  # Debugging line
         return self.weights[(node1_id, node2_id)] 
 
     def are_connected(self, node1_id, node2_id):
@@ -60,11 +59,10 @@ with open('FinalProject/london_stations.csv', 'r') as station:
         longitude = float(row['longitude'])
         name = row['name']
         display_name = row['display_name']
-        zone = float(row['zone'])  # Convert 'zone' to float
+        zone = float(row['zone'])
         total_lines = int(row['total_lines'])
         rail = int(row['rail'])
 
-        # Create a node and add it to the graph
         node = Node(node_id, latitude, longitude, name, display_name, zone, total_lines, rail)
         graph.add_node(node)
 
@@ -122,7 +120,6 @@ def dijkstra2(G, source, destination):
         relaxCount[node_id] = {'distance': 0, 'transfers': 0}
         visited[node_id] = False
 
-    # Update distance for the source node
     dist[source.id] = 0
     Q.decrease_key(source.id, 0)
     visited[source.id] = True
@@ -146,13 +143,10 @@ def dijkstra2(G, source, destination):
                     Q.decrease_key(neighbor_id, temp)
                     dist[neighbor_id] = temp
 
-                    # Update transfer count if line transfer occurs
                     if neighbor.total_lines != prev_line:
                         relaxCount[neighbor_id]['transfers'] += 1
-                    # Update distance and line information
                     relaxCount[neighbor_id]['distance'] += 1
                     prev_line = neighbor.total_lines
-    # print(dist, relaxCount)
     return dist[destination.id], relaxCount[destination.id]
 
 
@@ -167,7 +161,6 @@ def dijkstra3(G, source, destination):
         dist[node_id] = float("inf")
         visited[node_id] = False
 
-    # Update distance for the source node
     dist[source.id] = 0
     Q.decrease_key(source.id, 0)
     visited[source.id] = True
@@ -239,8 +232,8 @@ def run_experiment(graph):
 
 
 
-                source_node = graph.nodes.get(source_node_id)  # Get Node object
-                destination_node = graph.nodes.get(destination_node_id)  # Get Node object
+                source_node = graph.nodes.get(source_node_id)
+                destination_node = graph.nodes.get(destination_node_id)
 
                 start_time = timeit.default_timer()
                 dijkstra_distance = dijkstra3(graph, source_node, destination_node)  
