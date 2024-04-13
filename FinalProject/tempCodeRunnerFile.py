@@ -4,7 +4,7 @@ from Part2 import WeightedGraph
 from Part3 import A_star
 import math
 
-class Graph:
+class Graph(ABC):
 
     def __init__(self,nodes):
         self.graph = [[] for _ in range(nodes)]
@@ -22,8 +22,9 @@ class Graph:
     def get_num_of_nodes(self) -> int:
         return WeightedGraph.get_number_of_nodes(self)
     
-    # TA said there should be no w in class "Graph".
-
+    @abstractmethod 
+    def w(self, node):
+        pass
 class WeightedGraph(Graph):
 
     def w(self,node1:int, node2:int) -> float:
@@ -34,11 +35,11 @@ class HeuristicGraph(WeightedGraph):
         super().__init__(nodes)
         self.heuristic = {}
 
-    def get_heuristic(self) -> Dict[int, float]:
-        return self.heuristic
-
     def set_heuristic(self, node: int, value: float):
         self.heuristic[node] = value
+
+    def get_heuristic(self) -> Dict[int, float]:
+        return self.heuristic
     
 
 class SPAlgorithm(ABC):
@@ -149,4 +150,3 @@ class ShortPathFinder:
 
     def set_algorithm(self, algorithm:SPAlgorithm):
         self._SPAlgorithm = algorithm
-

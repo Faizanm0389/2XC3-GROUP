@@ -39,7 +39,7 @@ class WeightedGraph:
         return sum(len(edges) for edges in self.graph)
     
 
-def dijkstra(g):
+def all_pairs_dijkstra(g):
     INF = math.inf
     n = g.get_number_of_nodes()
     dist_result = [[INF for _ in range(n)] for _ in range(n)]
@@ -53,10 +53,12 @@ def dijkstra(g):
         while True:
             min_distance = INF
             min_node = -1
+
             for node in range(n):
-                if not marked[node] and dist[node] < min_distance:
-                    min_distance = dist[node]
-                    min_node = node
+                if not marked[node]:
+                    if dist[node] < min_distance:
+                        min_distance = dist[node]
+                        min_node = node
 
             if min_node == -1:
                 break
@@ -65,6 +67,7 @@ def dijkstra(g):
 
             for neighbor in g.get_neighbors(min_node):
                 distance = dist[min_node] + g.get_weights(min_node, neighbor)
+                
                 if distance < dist[neighbor]:
                     dist[neighbor] = distance
                     prev[source][neighbor] = min_node
@@ -75,7 +78,7 @@ def dijkstra(g):
     return dist_result, prev
 
 
-def bellman_ford(g):
+def all_pairs_bellman_ford(g):
     INF = math.inf
     n = g.get_number_of_nodes()
     dist_result = [[INF for _ in range(n)] for _ in range(n)]
@@ -91,11 +94,17 @@ def bellman_ford(g):
         for _ in range(n - 1):
             for node in range(n):
                 for neighbor in g.get_neighbors(node):
-                    weight = g.get_weights(node, neighbor)
-                    if distance[node] + weight < distance[neighbor]:
-                        distance[neighbor] = distance[node] + weight
+                    w = g.get_weights(node, neighbor)
+                    if (distance[node] + w) < distance[neighbor]:
+                        distance[neighbor] = distance[node] + w
                         prev[source][neighbor] = node
 
+        for node in range(n):
+            for neighbor in g.get_neighbors(node):
+                w = g.get_weights(node, neighbor)
+                if (distance[node] + w) < distance[neighbor]:
+                    raise ValueError("Negative weight cycle detected")
+            
         dist_result[source] = distance
 
     return dist_result, prev
@@ -127,14 +136,41 @@ g.add_edge(5,3,40)
 
 g.add_edge(4,5,15)
 
-dist, prev = dijkstra(g)
-dist, prev = bellman_ford(g)
-print("Distance for all pairs: \n")
-for row in dist:
-    print(row)\
 
-print("\n \n")
+# To test Negative cycle
+# g= WeightedGraph(4)
 
-print("Second-to-last vertex:")
-for row in prev:
+# g.add_edge(0,1,4)
+
+# g.add_edge(1,2,-2)
+# g.add_edge(1,3,5)
+
+# g.add_edge(2,0,-3)
+# g.add_edge(2,3,3)
+
+# g.add_edge(3,1,6)
+
+distd, prevd = all_pairs_dijkstra(g)
+distb, prevb = all_pairs_bellman_ford(g)
+
+print("Distance for all pairs in Dijkstra: \n")
+for row in distd:
+    print(row)
+
+print("\n")
+
+print("Second-to-last vertex in Djikstra: \n")
+for row in prevd:
+    print(row)
+
+print("\n\n")
+
+print("Distance for all pairs in Bellman-Ford: \n")
+for row in distb:
+    print(row)
+
+print("\n")
+
+print("Second-to-last vertex in Bellman-Ford: \n")
+for row in prevb:
     print(row)
